@@ -87,9 +87,53 @@ void updateDir(fileTree* ft, char *dir, int depth, char* path) {
     //printf("end: %s\n", path);
 }
 
+void updateDirTest(fileTree* ft, char *dir, int depth, char* path) {
+    //printf("begin: %s\n", path);
+    DIR *dp;
+    struct dirent *entry;
+    struct stat statbuf;
+    if((dp = opendir(dir)) == NULL) {
+        fprintf(stderr,"cannot open directory: %s\n", dir);
+        return;
+    }
+    chdir(dir);
+    while((entry = readdir(dp)) != NULL) { //read a file in the dir and return an entry
+        lstat(entry->d_name,&statbuf);     //read file name of the entry and store into the buffer
+        if(S_ISDIR(statbuf.st_mode)) {     //if the file is a dir then print the dir name and recursive into the file
+            /* Found a directory, but ignore . and .. */
+            if(strcmp(".",entry->d_name) == 0 ||
+            strcmp("..",entry->d_name) == 0)
+                continue;
+            strcat(path, "/"); strcat(path, entry->d_name);
+            updateFile(ft, 0, "null", path);
+            /* Recurse at a new indent level */
+            updateDirTest(ft, entry->d_name,depth+4, path);
+            removeFileName(path, entry->d_name);
+        }
+        else {
+            strcat(path, "/"); strcat(path, entry->d_name);
+            char* MD5 = MDFile(entry->d_name);
+            if(MD5 != NULL) updateFile(ft, 1, MD5, path);
+            else updateFile(ft, 1, "null", path);
+            removeFileName(path, entry->d_name);
+        }
+    }
+    chdir("..");
+    closedir(dp);
+    //printf("end: %s\n", path);
+}
+
 int main() {
-    MDFile("./dir/OutputExample.docx");
     char path[PATH_MAX + 1] = "./dir";
+    char fullPath[PATH_MAX + 1];
+    if(getcwd(fullPath, sizeof (fullPath)) != NULL){
+        strcat(fullPath, &path[1]);
+        printf("Current working dir: %s\n", fullPath);
+        //return 0;
+    }
+    else{
+        return 1;
+    }
     printf("Directory scan of /dir:\n");
     //printdir("./dir",0, path);
     fileTree* ft = newFileTree();
@@ -97,9 +141,9 @@ int main() {
     //while loop
     while(1){
         sleep(1);
-        printf("looking...\n\n");
+        //printf("looking...\n\n");
         clearAllExist(ft->head);
-        updateDir(ft, "./dir",0, path);
+        updateDir(ft, fullPath,0, path);
         deleteAllFileNotExist(ft->head);
         //printFileTree(ft->head, 0);
     }
