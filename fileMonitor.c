@@ -143,8 +143,10 @@ int main() {
         printf("looking...\n\n");
         clearAllExist(ft->head);
         updateDir(ft, fullPath,0, path);
-        deleteAllFileNotExist(ft->head);
+        deleteAllFileNotExist(ft, ft->head);
         //printFileTree(ft->head, 0);
+        if(ft->currUpdate != NULL) printf("%s\n", ft->currUpdate);
+        clearContent(ft);
     }
     return 0;
 }

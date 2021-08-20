@@ -28,7 +28,10 @@ typedef struct fileNodeObj{
 typedef struct fileTreeObj{
 	int num;
 	fileNode* head;
+	char* currUpdate;
 }fileTree;
+
+void clearContent(fileTree* ft);
 
 void changeContent(char* org, char* after);
 
@@ -58,8 +61,10 @@ void updateFile(fileTree* ft, int type, char* MD5, char* path);
 
 void clearAllExist(fileNode* fn);
 
-fileNode* deleteAllFileNotExist(fileNode* fn);
+fileNode* deleteAllFileNotExist(fileTree* ft, fileNode* fn);
 
 fileNode* deleteFileNode(fileNode* head, fileNode* target);
+
+void updateInfo(fileTree* ft, fileNode* fn, char* operation);
 
 #endif

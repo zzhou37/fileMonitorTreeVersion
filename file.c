@@ -8,6 +8,14 @@ void changeContent(char* org, char* after){
     strcpy(org, after);
 }
 
+void clearContent(fileTree* ft){
+    if(ft->currUpdate != NULL){
+        memset(ft->currUpdate, '\0', strlen(ft->currUpdate));
+        free(ft->currUpdate);
+        ft->currUpdate = NULL;
+    }
+}
+
 void copyPointer(fileNode** p1, fileNode** p2){
     *p1 = *p2;
 }
@@ -222,16 +230,18 @@ void updateFile(fileTree* ft, int type, char* MD5, char* path){
         //compare MD5
         if(strcmp(MD5, fn->MD5) != 0){
             changeContent(fn->MD5, MD5);
-            printf("update MD5: ");
-            printFileNode(traceNode(ft, path, type), 0);
+            //printf("update MD5: ");
+            //printFileNode(traceNode(ft, path, type), 0);
+            updateInfo(ft, traceNode(ft, path, type), "upd");
         }
     }
     //if file doesn't exist
     else{
         //add file into
         addFileNode(ft, type, MD5, path);
-        printf("add node: ");
-        printFileNode(traceNode(ft, path, type), 0);
+        //printf("add node: ");
+        //printFileNode(traceNode(ft, path, type), 0);
+        updateInfo(ft, traceNode(ft, path, type), "add");
     }
 }
 
@@ -248,17 +258,18 @@ void clearAllExist(fileNode* fn){
 }
 
 //recursive all file not exist in the dir
-fileNode* deleteAllFileNotExist(fileNode* fn){
+fileNode* deleteAllFileNotExist(fileTree* ft, fileNode* fn){
     fileNode* newHead = fn;
     fileNode* curr = fn;
     while(curr != NULL){
         if(curr->type == 0){
-            curr->item = deleteAllFileNotExist(curr->item);
+            curr->item = deleteAllFileNotExist(ft, curr->item);
         }
         if(curr->exist == 0){
             //printf("intend to delete:");
-            printf("delete:");
-            printFileNode(curr, 0);
+            //printf("delete:");
+            //printFileNode(curr, 0);
+            updateInfo(ft, curr, "del");
             //if curr is the head
             if(curr == newHead){
                 //printf("curr == newHead\n");
@@ -284,6 +295,17 @@ static fileNode* testNewFileNode(){
     return a;
 }
 
+//add(a), del(d), upd(u)
+//example: operation:op;path:./path;MD5:md532bit\n
+void updateInfo(fileTree* ft, fileNode* fn, char* operation){
+    char info[strlen(fn->path)+strlen(fn->MD5)+30];
+    sprintf(info, "op:%s;path:%s;MD5:%s\n", operation, fn->path, fn->MD5);
+    int c;
+    if(ft->currUpdate == NULL) c = 0; else c = strlen(ft->currUpdate);
+    ft->currUpdate = realloc(ft->currUpdate, ( c + strlen(info)+ 1 ) * sizeof(char));
+    strcat(ft->currUpdate, info);
+    //printf("%s\n", info);
+}
 
 
 
