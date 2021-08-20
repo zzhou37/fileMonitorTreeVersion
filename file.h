@@ -12,6 +12,7 @@
 #include <time.h>
 
 #include "md5mit.h"
+#include "myJni.h"
 
 typedef struct fileNodeObj{
 	int type; //0 for dir; 1 for file

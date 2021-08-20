@@ -93,8 +93,6 @@ fileNode* findNode(fileNode* fn, char* name, int type){
     return NULL;
 }
 
-
-
 static int defineType(int i, int count, int type){
     if(i<count-1 || type==0) return 0;
     else return 1;
@@ -285,6 +283,7 @@ static fileNode* testNewFileNode(){
     fileNode* a = newFileNode(1, 1,"file 0", "0", "./path0");
     return a;
 }
+
 
 
 

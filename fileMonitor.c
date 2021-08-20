@@ -129,7 +129,6 @@ int main() {
     if(getcwd(fullPath, sizeof (fullPath)) != NULL){
         strcat(fullPath, &path[1]);
         printf("Current working dir: %s\n", fullPath);
-        //return 0;
     }
     else{
         return 1;
@@ -141,7 +140,7 @@ int main() {
     //while loop
     while(1){
         sleep(1);
-        //printf("looking...\n\n");
+        printf("looking...\n\n");
         clearAllExist(ft->head);
         updateDir(ft, fullPath,0, path);
         deleteAllFileNotExist(ft->head);
